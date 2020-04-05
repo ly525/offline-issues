@@ -1,3 +1,10 @@
+# 使用 issue 构建博客
+```bash
+npm i
+node src/cli ly525/bog # 拉取 issues，放到 md 文件夹，后期可以基于md 文件 + hexo 制作博客
+node src/cli.js --html # 将 md 转换为 html
+```
+
 # offline-issues
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)

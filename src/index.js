@@ -77,7 +77,10 @@ module.exports = function (token, options, cb) {
         return
       } else {
         if (body.message) return cb(null, body)
-        body.forEach(function (issue) {
+        body.filter(function (issue) {
+          // filter issue with TODO label
+          return !issue.labels.some(e => e.name === "TODO")
+        }).forEach(function (issue) {
           return allIssues.push(issue)
         })
         pagenum++
@@ -93,18 +96,29 @@ module.exports = function (token, options, cb) {
     issue.url = body.html_url
     issue.title = body.title
     issue.created_by = body.user.login || body.head.user.login
-    issue.created_at = new Date(body.created_at).toLocaleDateString()
+    issue.created_at = new Date(body.created_at).toLocaleString('en-GB')
+    issue.updated_at = new Date(body.updated_at).toLocaleString('en-GB')
+    issue.labels = []
     issue.body = body.body
     issue.state = body.state
     issue.comments = []
     issue.comments_url = body.comments_url
     issue.milestone = body.milestone ? body.milestone.title : null
+    issue.number = body.number // issue id
 
     if (repo.issue === 'all') {
       issue.quicklink = repo.full + '#' + body.html_url.split('/').pop()
     } else issue.quicklink = repo.full
 
-    getComments(issue, repo, cb)
+    body.labels.forEach(function(label) {
+      issue.labels.push(label.name)
+    })
+    issue.labels = "[" + issue.labels.join(",") + "]"
+
+    // created by the user
+    if (issue.created_by == repo.user) {
+      getComments(issue, repo, cb)
+    }
   }
 
   function getComments (issue, repo, cb) {
@@ -140,8 +154,17 @@ module.exports = function (token, options, cb) {
 
     fs.writeFile('comments.json', data, function (err) {
       if (err) return cb(err, 'Error in writing data file.')
-      writemarkdown(options, cb)
-      writehtml(options, cb)
+      switch (options.type){
+        case "markdown":
+          writemarkdown(options, cb)
+          break
+        case "html":
+          writehtml(options, cb)
+          break
+        default:
+          writemarkdown(options, cb)
+          writehtml(options, cb)
+      }
     })
   }
 }

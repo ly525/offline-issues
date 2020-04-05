@@ -18,6 +18,8 @@
     "cpr": "^1.1.1",
     "ghauth": "^3.2.0",
     "handlebars": "^4.0.5",
+    "hexo-renderer-pug": "^1.0.0",
+    "hexo-renderer-sass": "^0.4.0",
     "marked": "^0.3.5",
     "mkdirp": "^0.5.1",
     "request": "^2.72.0",
